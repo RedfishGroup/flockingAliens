@@ -46,7 +46,7 @@ class FlockModel extends Model {
     this.setVision(5);
     this.minSeparation = 0.75;
     // this.anim.setRate(30)
-    this.population = 200; // 300 // 1e4 this.patches.length
+    this.population = 30; // 300 // 1e4 this.patches.length
     util.repeat(this.population, () => {
       this.patches.oneOf().sprout();
     });
