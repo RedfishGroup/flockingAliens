@@ -18,7 +18,7 @@ String.prototype.insert = function(index, string) {
 };
 
 util.toWindow({ ColorMap, Model, util });
-var spaceShipRef = fbRootRef.ref().child("spaceships");
+var spaceShipRef = fbRootRef.ref().child("spaceships2");
 
 class FlockModel extends Model {
   setVision(vision) {
@@ -55,9 +55,6 @@ class FlockModel extends Model {
       console.log(title);
       a.title = title;
     });
-    if (PUBLISH_TO_FB) {
-      this.publishToFirebase();
-    }
   }
 
   publishToFirebase() {
@@ -70,6 +67,7 @@ class FlockModel extends Model {
       let lon = a.x / 800 - 105.9632124;
       let color = a.color.getCss();
       if (color.length < 5) {
+        // make sure it is a 6 digit color, for geojson
         color = color
           .insert(4, "0")
           .insert(3, "0")
@@ -90,13 +88,15 @@ class FlockModel extends Model {
       features.features.push(feat);
     });
     spaceShipRef.set(features);
-    setTimeout(this.publishToFirebase.bind(this), 500);
   }
 
   step() {
     this.turtles.ask(t => {
       this.flock(t);
     });
+    if (PUBLISH_TO_FB && this.anim.ticks % 100 == 0) {
+      this.publishToFirebase();
+    }
   }
   flock(a) {
     // a is turtle
