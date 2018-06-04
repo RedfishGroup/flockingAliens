@@ -46,7 +46,7 @@ class FlockModel extends Model {
     this.setVision(5);
     this.minSeparation = 0.75;
     // this.anim.setRate(30)
-    this.population = 30; // 300 // 1e4 this.patches.length
+    this.population = 200; // 300 // 1e4 this.patches.length
     util.repeat(this.population, () => {
       this.patches.oneOf().sprout();
     });
@@ -103,9 +103,9 @@ class FlockModel extends Model {
     // flockmates = this.turtles.inRadius(a, this.vision).other(a)
     const flockmates = this.turtles.inRadius(a, this.vision, false);
     // flockmates = a.inRadius(this.turtles, this.vision, false)
-    if (this.inBounds(a) || this.farFromCenter(a)) {
+    if (this.farFromCenter(a)) {
       const theta = a.towards({ x: 0, y: 0 });
-      this.turnTowards(a, theta, Math.PI / 10);
+      this.turnTowards(a, theta, Math.PI / 20);
     } else if (flockmates.length !== 0) {
       // REMIND: distanceSq or manhattan distance
       const nearest = flockmates.minOneOf(f => f.distance(a));
@@ -117,6 +117,9 @@ class FlockModel extends Model {
       }
     }
     a.forward(a.speed);
+    this.findHeight(a);
+  }
+  findHeight(a) {
     //
     // Figure out Z
     //
