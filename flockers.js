@@ -126,9 +126,9 @@ class FlockModel extends Model {
     const chosenZ = Math.sin(d * (Math.PI / 2)) * MAX_Z + MIN_Z;
     // use hookes spring law to make them atracted to the funnel
     let disp = chosenZ - a.z; // displacement
-    const springK = 0.2;
-    const resistanceK = 0.8;
-    const dt = 0.01;
+    const springK = 0.3;
+    const resistanceK = 0.1;
+    const dt = 0.02;
     const resistance = -a.dz * resistanceK; // resistance, goes in oppisite direction as motion.
     let F = springK * disp + resistance; // Force = k*d - r
     a.dz += F * dt;
@@ -136,7 +136,7 @@ class FlockModel extends Model {
     if (Math.random() > 0.9 && a.z < MAX_Z) {
       a.dz = a.dz + Math.random() * 0.02;
     }
-    a.z = a.z + a.dz;
+    a.z = a.z + a.dz * dt;
   }
   separate(a, nearest) {
     const theta = nearest.towards(a);
