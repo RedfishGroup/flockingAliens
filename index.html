@@ -1,0 +1,29 @@
+<html>
+
+<head>
+    <title>asx</title>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+    <script>
+
+        var fbRootRef = firebase.initializeApp(
+            {
+                apiKey: 'AIzaSyBI-Js8EBS6pe2GmTG0IGpxgeIbtGJkbIA',
+                databaseURL: 'https://livetexture.firebaseio.com',
+                authDomain: 'livetexture.firebaseapp.com',
+                projectId: 'firebase-livetexture',
+            },
+            'livetexture'
+        ).database()
+
+    </script>
+</head>
+
+<body>
+
+    <script type="module">
+        import './flockers.js'
+    </script>
+    <div id='modeldiv'></div>
+</body>
+
+</html>

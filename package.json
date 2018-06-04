@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@redfish/as-app3d": "github:backspaces/as-app3d.git"
+  }
+}
