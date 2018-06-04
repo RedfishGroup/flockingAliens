@@ -134,7 +134,7 @@ class FlockModel extends Model {
     a.dz += F * dt;
     // add a little fluctuation
     if (Math.random() > 0.9 && a.z < MAX_Z) {
-      a.dz = a.dz + Math.random() * 0.02;
+      a.dz = a.dz + Math.random() * 0.2;
     }
     a.z = a.z + a.dz * dt;
   }
