@@ -5,7 +5,7 @@ import {
 } from "./node_modules/@redfish/as-app3d/docs/dist/as-app3d.esm.js";
 
 const PUBLISH_TO_FB = true;
-const MAX_Z = 10;
+const MAX_Z = 11;
 const MIN_Z = 1;
 let SHAPES = ["👽", "👾", "🤖", "🛸", "🛰️", "🦂"];
 
