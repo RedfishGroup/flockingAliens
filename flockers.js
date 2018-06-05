@@ -55,6 +55,8 @@ class FlockModel extends Model {
       console.log(title);
       a.title = title;
     });
+    this.turtles[0].title = "SFI";
+    this.turtles[1].title = "🐉";
   }
 
   publishToFirebase() {
@@ -94,7 +96,7 @@ class FlockModel extends Model {
     this.turtles.ask(t => {
       this.flock(t);
     });
-    if (PUBLISH_TO_FB && this.anim.ticks % 100 == 0) {
+    if (PUBLISH_TO_FB && this.anim.ticks % 30 == 0) {
       this.publishToFirebase();
     }
   }
