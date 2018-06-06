@@ -7,7 +7,7 @@ import {
 const PUBLISH_TO_FB = true;
 const MAX_Z = 30;
 const MIN_Z = 1;
-let SHAPES = ["👽", "👾", "🤖", "🛸", "🛰️", "🦂"];
+let SHAPES = ["👽", "👾", "🤖", "👁", "🛰️", "🦂"];
 var CENTER_LAT = 35.682991;
 var LAT_HEIGHT = 0.1;
 var CENTER_LON = -105.94868;
