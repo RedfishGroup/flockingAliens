@@ -5,9 +5,13 @@ import {
 } from "./node_modules/@redfish/as-app3d/docs/dist/as-app3d.esm.js";
 
 const PUBLISH_TO_FB = true;
-const MAX_Z = 11;
+const MAX_Z = 30;
 const MIN_Z = 1;
 let SHAPES = ["👽", "👾", "🤖", "🛸", "🛰️", "🦂"];
+var CENTER_LAT = 35.682991;
+var LAT_HEIGHT = 0.1;
+var CENTER_LON = -105.94868;
+var LON_WIDTH = 0.1;
 
 String.prototype.insert = function(index, string) {
   if (index > 0)
@@ -30,6 +34,8 @@ class FlockModel extends Model {
   }
   setup() {
     // console.log('firebase', firebase)
+    this.circleRadius = 12; // model coords
+    this.dt = 0.02;
     this.turtles.setDefault("atEdge", "wrap");
     this.turtles.setDefault("z", MAX_Z);
     this.turtles.setDefault("dz", -0.1);
@@ -44,7 +50,7 @@ class FlockModel extends Model {
     this.refreshPatches = false;
     this.setMaxTurn(3.0);
     this.setVision(5);
-    this.minSeparation = 0.75;
+    this.minSeparation = 0.05;
     // this.anim.setRate(30)
     this.population = 30; // 300 // 1e4 this.patches.length
     util.repeat(this.population, () => {
@@ -54,6 +60,7 @@ class FlockModel extends Model {
       const title = SHAPES[Math.floor(SHAPES.length * Math.random())];
       console.log(title);
       a.title = title;
+      a.onMission = false;
     });
     this.turtles[0].title = "SFI";
     this.turtles[1].title = "🐉";
@@ -65,8 +72,8 @@ class FlockModel extends Model {
       features: []
     };
     this.turtles.forEach(a => {
-      let lat = a.y / 800 + 35.6653334;
-      let lon = a.x / 800 - 105.9632124;
+      let lat = (LAT_HEIGHT * a.y) / this.world.height + CENTER_LAT;
+      let lon = (LON_WIDTH * a.x) / this.world.width + CENTER_LON;
       let color = a.color.getCss();
       if (color.length < 5) {
         // make sure it is a 6 digit color, for geojson
@@ -95,6 +102,7 @@ class FlockModel extends Model {
   step() {
     this.turtles.ask(t => {
       this.flock(t);
+      this.findHeight(t);
     });
     if (PUBLISH_TO_FB && this.anim.ticks % 30 == 0) {
       this.publishToFirebase();
@@ -119,27 +127,27 @@ class FlockModel extends Model {
       }
     }
     a.forward(a.speed);
-    this.findHeight(a);
   }
+  //
+  // Figure out Z
+  //
   findHeight(a) {
-    //
-    // Figure out Z
-    //
     let d = Math.hypot(a.x - this.world.centerX, a.y - this.world.centerY);
-    d = d / this.world.width;
+    d = d / (this.circleRadius * 2);
     // aproximate the funnel shape we want with a sin function. This could be any shape
-    const chosenZ = Math.sin(d * (Math.PI / 2)) * MAX_Z + MIN_Z;
+    let chosenZ = Math.sin(d * (Math.PI / 2)) * MAX_Z + MIN_Z;
+    chosenZ = Math.max(1, chosenZ);
     // use hookes spring law to make them atracted to the funnel
     let disp = chosenZ - a.z; // displacement
     const springK = 0.3;
     const resistanceK = 0.1;
-    const dt = 0.02;
+    const dt = this.dt;
     const resistance = -a.dz * resistanceK; // resistance, goes in oppisite direction as motion.
     let F = springK * disp + resistance; // Force = k*d - r
     a.dz += F * dt;
     // add a little fluctuation
     if (Math.random() > 0.9 && a.z < MAX_Z) {
-      a.dz = a.dz + Math.random() * 0.2;
+      a.dz = a.dz + Math.random() * 0.1;
     }
     a.z = a.z + a.dz * dt;
   }
@@ -155,9 +163,10 @@ class FlockModel extends Model {
       a.y > this.world.maxY - 1
     );
   }
-  farFromCenter(a) {
+  farFromCenter(a, maxD) {
+    maxD = maxD || this.circleRadius;
     let d = Math.hypot(a.x - this.world.centerX, a.y - this.world.centerY);
-    return d > this.world.width / 2 - 2;
+    return d > this.circleRadius;
   }
   align(a, flockmates) {
     this.turnTowards(a, this.averageHeading(flockmates));
@@ -192,7 +201,12 @@ class FlockModel extends Model {
   }
 }
 
-const model = new FlockModel();
+const model = new FlockModel(document.body, {
+  minX: -50,
+  maxX: 50,
+  minY: -50,
+  maxY: 50
+});
 model.setup();
 model.start();
 
