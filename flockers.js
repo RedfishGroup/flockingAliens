@@ -39,7 +39,7 @@ class FlockModel extends Model {
     this.turtles.setDefault("atEdge", "wrap");
     this.turtles.setDefault("z", MAX_Z);
     this.turtles.setDefault("dz", -0.1);
-    this.turtles.setDefault("size", 1);
+    this.turtles.setDefault("size", 10);
     this.turtles.setDefault("speed", 0.01);
 
     const cmap = ColorMap.grayColorMap(0, 100);
