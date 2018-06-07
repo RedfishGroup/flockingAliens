@@ -2,7 +2,7 @@ import {
   util,
   ColorMap,
   Model
-} from "./node_modules/@redfish/as-app3d/docs/dist/as-app3d.esm.js";
+} from "https://backspaces.github.io/as-app3d/dist/as-app3d.esm.js?modue";
 
 const PUBLISH_TO_FB = true;
 const MAX_Z = 30;
