@@ -35,12 +35,15 @@ class FlockModel extends Model {
   setup() {
     // console.log('firebase', firebase)
     this.circleRadius = 12; // model coords
-    this.dt = 0.02;
+    this.dt = 0.2;
+    this.MAX_MISSIONARIES = 10;
+    this.missionDuration = 4 * 60 * 1000;
+
     this.turtles.setDefault("atEdge", "wrap");
     this.turtles.setDefault("z", MAX_Z);
     this.turtles.setDefault("dz", -0.1);
     this.turtles.setDefault("size", 10);
-    this.turtles.setDefault("speed", 0.01);
+    this.turtles.setDefault("speed", 1);
 
     const cmap = ColorMap.grayColorMap(0, 100);
     this.patches.ask(p => {
@@ -61,6 +64,8 @@ class FlockModel extends Model {
       console.log(title);
       a.title = title;
       a.onMission = false;
+      a.missionStart = 0;
+      a.missionDestiantion = [0, 0];
     });
     this.turtles[0].title = "SFI";
     this.turtles[1].title = "🐉";
@@ -75,6 +80,8 @@ class FlockModel extends Model {
       let lat = (LAT_HEIGHT * a.y) / this.world.height + CENTER_LAT;
       let lon = (LON_WIDTH * a.x) / this.world.width + CENTER_LON;
       let color = a.color.getCss();
+      let title = a.title;
+      if (a.onMission) title = `📸${title}📸`;
       if (color.length < 5) {
         // make sure it is a 6 digit color, for geojson
         color = color
@@ -85,7 +92,7 @@ class FlockModel extends Model {
       let feat = {
         type: "Feature",
         properties: {
-          title: a.title,
+          title: title,
           stroke: color,
           fill: color
         },
@@ -94,20 +101,70 @@ class FlockModel extends Model {
           coordinates: [lon, lat, 2000 + a.z * 100]
         }
       };
+      if (a.onMission) {
+        feat.properties.onMission = true;
+      }
       features.features.push(feat);
     });
     spaceShipRef.set(features);
   }
 
-  step() {
+  howManyOnMission() {
+    let count = 0;
     this.turtles.ask(t => {
-      this.flock(t);
-      this.findHeight(t);
+      if (t.onMission) count++;
     });
-    if (PUBLISH_TO_FB && this.anim.ticks % 30 == 0) {
-      this.publishToFirebase();
+    return count;
+  }
+
+  step() {
+    let busyTurtles = this.howManyOnMission();
+    this.turtles.ask(t => {
+      if (!t.onMission) {
+        this.flock(t);
+        this.findHeight(t);
+        if (busyTurtles < this.MAX_MISSIONARIES && Math.random() > 0.999) {
+          this.sendOnMission(t);
+        }
+      } else {
+        this.doMission(t);
+        // fly twards destination
+      }
+    });
+    if (this.anim.ticks % 30 == 0) {
+      // console.log("missionaries", this.howManyOnMission());
+      if (PUBLISH_TO_FB) {
+        this.publishToFirebase();
+      }
     }
   }
+
+  doMission(a) {
+    let dest = { x: a.missionDestiantion[0], y: a.missionDestiantion[1] };
+    const theta = a.towards(dest);
+    this.turnTowards(a, theta, Math.PI / 20);
+    a.z = 4;
+    if (a.distance(dest) > 0.5) {
+      a.forward(a.speed * this.dt);
+    } else {
+      var now = new Date().getTime();
+      if (now - a.missionStart > this.missionDuration) {
+        a.onMission = false;
+        a.missionDestiantion = [0, 0];
+        a.missionStart = 0;
+      }
+    }
+  }
+
+  sendOnMission(a) {
+    a.onMission = true;
+    let x = Math.random() * this.world.width + this.world.minX;
+    let y = Math.random() * this.world.height + this.world.minY;
+    a.missionDestiantion = [x, y];
+    a.missionStart =
+      new Date().getTime() + (Math.random() * this.missionDuration) / 4;
+  }
+
   flock(a) {
     // a is turtle
     // flockmates = this.turtles.inRadius(a, this.vision).other(a)
@@ -126,7 +183,7 @@ class FlockModel extends Model {
         this.cohere(a, flockmates);
       }
     }
-    a.forward(a.speed);
+    a.forward(a.speed * this.dt);
   }
   //
   // Figure out Z
