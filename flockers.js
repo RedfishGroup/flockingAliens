@@ -35,8 +35,8 @@ class FlockModel extends Model {
   setup() {
     // console.log('firebase', firebase)
     this.circleRadius = 12; // model coords
-    this.dt = 0.2;
-    this.MAX_MISSIONARIES = 10;
+    this.dt = 0.02;
+    this.MAX_MISSIONARIES = 4;
     this.missionDuration = 4 * 60 * 1000;
 
     this.turtles.setDefault("atEdge", "wrap");
