@@ -64,6 +64,7 @@ class FlockModel extends Model {
       console.log(title);
       a.title = title;
       a.onMission = false;
+      a.id = Math.floor(Math.random() * 1000000);
       a.missionStart = 0;
       a.missionDestiantion = [0, 0];
     });
