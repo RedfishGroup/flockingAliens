@@ -8,9 +8,15 @@ const PUBLISH_TO_FB = true;
 const MAX_Z = 30;
 const MIN_Z = 1;
 let SHAPES = ["👽", "👾", "🤖", "👁", "🛰️", "🦂"];
-var CENTER_LAT = 35.1224946; //35.682991;
+// ABQ
+// var CENTER_LAT = 35.1224946; //35.682991;
+// var LAT_HEIGHT = 0.1;
+// var CENTER_LON = -106.5821309;
+// Sante fe
+var CENTER_LAT = 35.682991;
 var LAT_HEIGHT = 0.1;
-var CENTER_LON = -106.5821309;
+var CENTER_LON = -105.94868;
+
 var LON_WIDTH = 0.1;
 
 String.prototype.insert = function(index, string) {
@@ -71,6 +77,7 @@ class FlockModel extends Model {
     this.turtles[0].title = "SFI";
     this.turtles[1].title = "🐉";
     this.turtles[2].title = "🐡";
+    this.turtles[2].color.setColor(255, 0, 0);
   }
 
   publishToFirebase() {
