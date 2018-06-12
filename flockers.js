@@ -8,9 +8,9 @@ const PUBLISH_TO_FB = true;
 const MAX_Z = 30;
 const MIN_Z = 1;
 let SHAPES = ["👽", "👾", "🤖", "👁", "🛰️", "🦂"];
-var CENTER_LAT = 35.682991;
+var CENTER_LAT = 35.1224946; //35.682991;
 var LAT_HEIGHT = 0.1;
-var CENTER_LON = -105.94868;
+var CENTER_LON = -106.5821309;
 var LON_WIDTH = 0.1;
 
 String.prototype.insert = function(index, string) {
@@ -22,7 +22,7 @@ String.prototype.insert = function(index, string) {
 };
 
 util.toWindow({ ColorMap, Model, util });
-var spaceShipRef = fbRootRef.ref().child("spaceships2");
+var spaceShipRef = fbRootRef.ref().child("spaceships");
 
 class FlockModel extends Model {
   setVision(vision) {
@@ -64,12 +64,13 @@ class FlockModel extends Model {
       console.log(title);
       a.title = title;
       a.onMission = false;
-      a.id = Math.floor(Math.random() * 1000000);
+      a.id = Math.floor(Math.random() * 100000000);
       a.missionStart = 0;
       a.missionDestiantion = [0, 0];
     });
     this.turtles[0].title = "SFI";
     this.turtles[1].title = "🐉";
+    this.turtles[2].title = "🐡";
   }
 
   publishToFirebase() {
@@ -95,7 +96,8 @@ class FlockModel extends Model {
         properties: {
           title: title,
           stroke: color,
-          fill: color
+          fill: color,
+          id: a.id
         },
         geometry: {
           type: "Point",
