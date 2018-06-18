@@ -1,18 +1,13 @@
 import {
   util,
   ColorMap,
-  Model
-} from "https://backspaces.github.io/as-app3d/dist/as-app3d.esm.js?modue";
+  Model,
+} from 'https://backspaces.github.io/as-app3d/dist/as-app3d.esm.js?module';
 
 const PUBLISH_TO_FB = true;
 const MAX_Z = 30;
 const MIN_Z = 1;
-let SHAPES = ["👽", "👾", "🤖", "👁", "🛰️", "🦂"];
-// ABQ
-// var CENTER_LAT = 35.1224946; //35.682991;
-// var LAT_HEIGHT = 0.1;
-// var CENTER_LON = -106.5821309;
-// Sante fe
+let SHAPES = ['👽', '👾', '🤖', '👁', '🛰️', '🦂'];
 var CENTER_LAT = 35.682991;
 var LAT_HEIGHT = 0.1;
 var CENTER_LON = -105.94868;
@@ -28,7 +23,7 @@ String.prototype.insert = function(index, string) {
 };
 
 util.toWindow({ ColorMap, Model, util });
-var spaceShipRef = fbRootRef.ref().child("spaceships");
+var spaceShipRef = fbRootRef.ref().child('spaceships2');
 
 class FlockModel extends Model {
   setVision(vision) {
@@ -45,11 +40,11 @@ class FlockModel extends Model {
     this.MAX_MISSIONARIES = 4;
     this.missionDuration = 4 * 60 * 1000;
 
-    this.turtles.setDefault("atEdge", "wrap");
-    this.turtles.setDefault("z", MAX_Z);
-    this.turtles.setDefault("dz", -0.1);
-    this.turtles.setDefault("size", 10);
-    this.turtles.setDefault("speed", 1);
+    this.turtles.setDefault('atEdge', 'wrap');
+    this.turtles.setDefault('z', MAX_Z);
+    this.turtles.setDefault('dz', -0.1);
+    this.turtles.setDefault('size', 10);
+    this.turtles.setDefault('speed', 1);
 
     const cmap = ColorMap.grayColorMap(0, 100);
     this.patches.ask(p => {
@@ -74,16 +69,14 @@ class FlockModel extends Model {
       a.missionStart = 0;
       a.missionDestiantion = [0, 0];
     });
-    this.turtles[0].title = "SFI";
-    this.turtles[1].title = "🐉";
-    this.turtles[2].title = "🐡";
-    this.turtles[2].color.setColor(255, 0, 0);
+    this.turtles[0].title = 'SFI';
+    this.turtles[1].title = '🐉';
   }
 
   publishToFirebase() {
     let features = {
-      type: "FeatureCollection",
-      features: []
+      type: 'FeatureCollection',
+      features: [],
     };
     this.turtles.forEach(a => {
       let lat = (LAT_HEIGHT * a.y) / this.world.height + CENTER_LAT;
@@ -94,22 +87,21 @@ class FlockModel extends Model {
       if (color.length < 5) {
         // make sure it is a 6 digit color, for geojson
         color = color
-          .insert(4, "0")
-          .insert(3, "0")
-          .insert(2, "0");
+          .insert(4, '0')
+          .insert(3, '0')
+          .insert(2, '0');
       }
       let feat = {
-        type: "Feature",
+        type: 'Feature',
         properties: {
           title: title,
           stroke: color,
           fill: color,
-          id: a.id
         },
         geometry: {
-          type: "Point",
-          coordinates: [lon, lat, 2000 + a.z * 100]
-        }
+          type: 'Point',
+          coordinates: [lon, lat, 2000 + a.z * 100],
+        },
       };
       if (a.onMission) {
         feat.properties.onMission = true;
@@ -272,13 +264,13 @@ const model = new FlockModel(document.body, {
   minX: -50,
   maxX: 50,
   minY: -50,
-  maxY: 50
+  maxY: 50,
 });
 model.setup();
 model.start();
 
 // Debugging
-console.log("patches:", model.patches.length);
-console.log("turtles:", model.turtles.length);
+console.log('patches:', model.patches.length);
+console.log('turtles:', model.turtles.length);
 const { world, patches, turtles } = model;
 util.toWindow({ world, patches, turtles, model });
